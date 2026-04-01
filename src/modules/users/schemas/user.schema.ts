@@ -28,7 +28,7 @@ export class User extends Document {
     accountType: string;
 
     @Prop()
-    isActive: string;
+    isActive: boolean;
 
     @Prop()
     codeId: string;
