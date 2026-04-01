@@ -15,29 +15,29 @@ export class CreateUserDto {
     @IsNotEmpty({ message: 'Mật khẩu không được để trống' })
     password: string;
 
-    @IsString()
+    // @IsString()
     phone: string;
 
-    @IsString()
+    // @IsString()
     address: string;
 
-    @IsString()
+    // @IsString()
     image: string;
 
-    @Prop({ default: 'USERS' })
-    @IsString()
+    // @Prop({ default: 'USERS' })
+    // @IsString()
     role: string;
 
-    @Prop({ default: 'LOCAL' })
-    @IsString()
+    // @Prop({ default: 'LOCAL' })
+    // @IsString()
     accountType: string;
 
-    @Prop({ default: false })
-    @IsBoolean()
-    @Transform(({ value }) => {
-        if (value === 'true') return true;
-        if (value === 'false') return false;
-        return value;
-    })
+    // @Prop({ default: false })
+    // @IsBoolean()
+    // @Transform(({ value }) => {
+    //     if (value === 'true') return true;
+    //     if (value === 'false') return false;
+    //     return value;
+    // })
     isActive: boolean;
 }
