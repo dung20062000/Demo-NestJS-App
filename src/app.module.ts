@@ -11,6 +11,7 @@ import { MenuItemOptionsModule } from '@/modules/menu.item.options/menu.item.opt
 import { MenuItemsModule } from '@/modules/menu.items/menu.items.module';
 import { OrderDetailModule } from '@/modules/order.detail/order.detail.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
+import { AuthModule } from '@/auth/auth.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { OrdersModule } from '@/modules/orders/orders.module';
         uri: configService.get<string>('MONGODB_URI'),
       }),
       inject: [ConfigService],
-    })
+    }),
+    AuthModule
 
   ],
   controllers: [AppController],

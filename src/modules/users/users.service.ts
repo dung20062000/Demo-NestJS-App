@@ -7,6 +7,7 @@ import { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
 import { hashPassword } from '@/helpers/util';
 import aqp from 'api-query-params';
+import mongoose from 'mongoose';
 @Injectable()
 export class UsersService {
   constructor(
@@ -65,11 +66,38 @@ export class UsersService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findByEmail(email: string) {
+    const user = await this.userModel.findOne({ email: email });
+    if (!user) {
+      throw new BadRequestException(`Không tìm thấy user với email ${email}`)
+    }
+    return user;
+  }
+  
+  async update(updateUserDto: UpdateUserDto) {
+    const user = await this.userModel.findById(updateUserDto._id);
+    if (!user) {
+      throw new BadRequestException(`Không tìm thấy user với id ${updateUserDto._id}`)
+    }
+    user.name = updateUserDto.name;
+    user.email = updateUserDto.email;
+    user.phone = updateUserDto.phone;
+    user.address = updateUserDto.address;
+    user.image = updateUserDto.image;
+    user.isActive = updateUserDto.isActive;
+    await user.save();
+    return { _id: user.id };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    if(!mongoose.isValidObjectId(id)){
+      throw new BadRequestException(`Id không hợp lệ ${id}`)
+    }
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new BadRequestException(`Không tìm thấy user với id ${id}`)
+    }
+    await user.deleteOne();
+    return { _id: user.id };
   }
 }

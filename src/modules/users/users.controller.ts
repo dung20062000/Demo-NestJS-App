@@ -25,14 +25,26 @@ export class UsersController {
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @Get(':email')
+  findByEmail(@Query('email') email: string) {
+    return this.usersService.findByEmail(email);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @Patch()
+  async update(@Body() updateUserDto: UpdateUserDto) {
+    return await this.usersService.update(updateUserDto);
+  }
+
+  // nếu truyền theo Param thì sẽ để như này
+  //http://localhost:8080/api/v1/users/69cdc90388fd8feb916b539
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.usersService.remove(id);
+  // }
+
+  //http://localhost:8080/api/v1/users?id=69cdc90388fd8feb916b539 nếu truyền theo Query thì sẽ để như này
+  @Delete()
+  remove(@Query('id') id: string) {
+    return this.usersService.remove(id);
   }
 }
