@@ -12,29 +12,32 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) { }
 
-  async login(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findByEmail(email);
-    if (!user) {
-      throw new UnauthorizedException(`Email hoặc mật khẩu không chính xác`)
-    }
-    const isPasswordValid = await comparePassword(password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException(`Email hoặc mật khẩu không chính xác`)
-    }
+  async login(user: any): Promise<any> {
     const payload = {
-      sub: user._id,
+      _id: user._id,
       email: user.email,
       name: user.name,
       role: user.role
     }
     return {
-      access_token: await this.jwtService.signAsync(payload),
-      user: {
-        _id: user._id,
-        email: user.email,
-        name: user.name,
-        role: user.role
-      }
+      access_token: await this.jwtService.signAsync(payload)
+    }
+  }
+
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      return null;
+    }
+    const isPasswordValid = await comparePassword(password, user.password);
+    if (!isPasswordValid) {
+      return null;
+    }
+    return {
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role
     }
   }
 }
