@@ -8,6 +8,9 @@ import { User } from './schemas/user.schema';
 import { hashPassword } from '@/helpers/util';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
+import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
 @Injectable()
 export class UsersService {
   constructor(
@@ -98,6 +101,30 @@ export class UsersService {
       throw new BadRequestException(`Không tìm thấy user với id ${id}`)
     }
     await user.deleteOne();
+    return { _id: user.id };
+  }
+
+
+  async register(registerDto: CreateAuthDto) {
+    //check email
+    if (await this.isEmailExist(registerDto.email)) {
+      throw new BadRequestException(`Email đã tồn tại ${registerDto.email}`)
+    }
+    //hash password
+    const hashedPassword = await hashPassword(registerDto.password);
+    const user = new this.userModel({
+      ...registerDto,
+      isActive: false,
+      password: hashedPassword,
+      codeId: uuidv4(),
+      codeExpired: dayjs().add(1, 'D'),
+      role: 'USER'
+    });
+
+    //send email
+    // this.sendEmail(user.email, 'Xác nhận đăng ký tài khoản', 'Bạn đã đăng ký tài khoản thành công');
+
+    await user.save();
     return { _id: user.id };
   }
 }
