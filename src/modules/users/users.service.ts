@@ -11,11 +11,13 @@ import mongoose from 'mongoose';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
+import { MailerService } from '@nestjs-modules/mailer';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
-    private readonly userModel: Model<User>
+    private readonly userModel: Model<User>,
+    private readonly mailerService: MailerService
   ) { }
   isEmailExist = async (email: string) => {
     const isExit = await this.userModel.exists({ email: email })
@@ -112,17 +114,30 @@ export class UsersService {
     }
     //hash password
     const hashedPassword = await hashPassword(registerDto.password);
+    const codeId = uuidv4()
     const user = new this.userModel({
       ...registerDto,
       isActive: false,
       password: hashedPassword,
-      codeId: uuidv4(),
-      codeExpired: dayjs().add(1, 'D'),
+      codeId: codeId,
+      codeExpired: dayjs().add(30, 'seconds'),
       role: 'USER'
     });
 
     //send email
-    // this.sendEmail(user.email, 'Xác nhận đăng ký tài khoản', 'Bạn đã đăng ký tài khoản thành công');
+    this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Xác nhận đăng ký tài khoản',
+      text: 'Bạn đã đăng ký tài khoản thành công',
+      template: 'register',
+      context: {
+        name: user.name  ?? user.email,
+        activationCode: codeId,
+      },
+    }).catch((error) => {
+      console.log(error);
+      throw new BadRequestException(`Gửi mail thất bại ${error}`)
+    });
 
     await user.save();
     return { _id: user.id };

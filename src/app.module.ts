@@ -15,7 +15,7 @@ import { AuthModule } from '@/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
 import { MailerModule } from '@nestjs-modules/mailer';
-// import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter'; 
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'; 
 
 @Module({
   imports: [
@@ -50,13 +50,13 @@ import { MailerModule } from '@nestjs-modules/mailer';
       defaults: {
         from: '"No Reply" <noreply@example.com>',
       },
-      // template: {
-      //   dir: __dirname + '/templates',
-      //   adapter: new HandlebarsAdapter(),
-      //   options: {
-      //     strict: true,
-      //   },
-      // },
+      template: {
+        dir: process.cwd() + '/src/mail/template',
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true, // để true thì khi gửi mail nếu có lỗi thì sẽ báo lỗi
+        },
+      },
       }),
       inject: [ConfigService],
     }),

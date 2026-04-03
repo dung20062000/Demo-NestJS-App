@@ -34,7 +34,11 @@ export class AuthController {
       to: 'dungdevnd@gmail.com',
       subject: 'Test',
       text: 'Test',
-      html: '<b>Test</b>',
+      template: 'register',
+      context: {
+        name: 'Bui Tien Dung',
+        activationCode: '123456',
+      },
     });
   }
 }
