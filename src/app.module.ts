@@ -14,6 +14,8 @@ import { OrdersModule } from '@/modules/orders/orders.module';
 import { AuthModule } from '@/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
+import { MailerModule } from '@nestjs-modules/mailer';
+// import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter'; 
 
 @Module({
   imports: [
@@ -30,6 +32,31 @@ import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGODB_URI'),
+      }),
+      inject: [ConfigService],
+    }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('EMAIL_HOST'),
+          port: configService.get<number>('EMAIL_PORT'),
+          secure: configService.get<boolean>('EMAIL_SECURE'), // true = 465, false = 587
+          auth: {
+          user: configService.get<string>('EMAIL_USER'),
+          pass: configService.get<string>('EMAIL_PASSWORD'),
+        },
+      },
+      defaults: {
+        from: '"No Reply" <noreply@example.com>',
+      },
+      // template: {
+      //   dir: __dirname + '/templates',
+      //   adapter: new HandlebarsAdapter(),
+      //   options: {
+      //     strict: true,
+      //   },
+      // },
       }),
       inject: [ConfigService],
     }),
